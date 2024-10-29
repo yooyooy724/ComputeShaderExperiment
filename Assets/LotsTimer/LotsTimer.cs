@@ -4,7 +4,6 @@ using UnityEngine.VFX;
 using Unity.Collections;
 using Unity.Mathematics;
 using Random = Unity.Mathematics.Random;
-using UnityEditor;
 
 public class LotsTimer : MonoBehaviour, ICalculator
 {
@@ -61,19 +60,11 @@ public class LotsTimer : MonoBehaviour, ICalculator
     {
         _compute.SetFloat("deltaTime", Time.deltaTime);
 
-        for (int i = 0; i < 100; i++)
-        {
-            _compute.GetKernelThreadGroupSizes(0, out var x, out var y, out var z);
-            _compute.Dispatch(_kernelIndex, (int)(MAX_COUNT / x), 1, 1);
-        }
         // 3. カーネル呼び出し
-        var array = new float[MAX_COUNT];
-        _timerBuffer.GetData(array);
+        _compute.GetKernelThreadGroupSizes(0, out var x, out var y, out var z);
+        _compute.Dispatch(_kernelIndex, (int) (MAX_COUNT / x), 1, 1);
+
         // 5はなし
-        for (int i = 0; i < 100; i++)
-        {
-            Debug.Log(array[i]);
-        }
     } 
 
     void OnDisable() => Dispose();

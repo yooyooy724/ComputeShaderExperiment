@@ -10,7 +10,7 @@ public interface ICalculator
 public class StopWatch : MonoBehaviour
 {
     private ICalculator calculator;
-
+    [SerializeField] int computeTimesCount = 100;
     private void Awake()
     {
         calculator = GetComponent<ICalculator>();
@@ -20,11 +20,7 @@ public class StopWatch : MonoBehaviour
         calculator.Initialize();
         var stopwatch = new System.Diagnostics.Stopwatch();
         stopwatch.Start();
-        // for (int i = 0; i < 100000; i++)
-        // {
-        //     calculator.Compute();
-        // }
-        for (int i = 0; i < 1; i++)
+        for (int i = 0; i < computeTimesCount; i++)
         {
             calculator.Compute();
         }
@@ -34,6 +30,6 @@ public class StopWatch : MonoBehaviour
 
         calculator.Dispose();
 
-        Destroy(this);
+        Destroy(gameObject);
     }
 }

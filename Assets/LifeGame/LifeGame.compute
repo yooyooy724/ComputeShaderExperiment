@@ -26,7 +26,7 @@ int CountNeighbors(int2 pos)
     return count;
 }
 
-[numthreads(32, 32, 1)]
+[numthreads(16, 16, 1)]
 void LifeGameCS(uint3 id : SV_DispatchThreadID)
 {
     int x = id.x;
