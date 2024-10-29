@@ -1,0 +1,55 @@
+#pragma kernel LifeGameCS
+
+// グリッドサイズと状態バッファ
+RWStructuredBuffer<int> stateBuffer;
+RWStructuredBuffer<int> nextStateBuffer;
+int gridWidth;
+int gridHeight;
+
+// 各セルの生死を判定する
+int CountNeighbors(int2 pos)
+{
+    int count = 0;
+    for (int y = -1; y <= 1; y++)
+    {
+        for (int x = -1; x <= 1; x++)
+        {
+            if (x == 0 && y == 0) continue;
+            int2 neighborPos = pos + int2(x, y);
+            if (neighborPos.x >= 0 && neighborPos.x < gridWidth && neighborPos.y >= 0 && neighborPos.y < gridHeight)
+            {
+                int neighborIndex = neighborPos.y * gridWidth + neighborPos.x;
+                count += stateBuffer[neighborIndex];
+            }
+        }
+    }
+    return count;
+}
+
+[numthreads(32, 32, 1)]
+void LifeGameCS(uint3 id : SV_DispatchThreadID)
+{
+    int x = id.x;
+    int y = id.y;
+
+    if (x < gridWidth && y < gridHeight)
+    {
+        int index = y * gridWidth + x;
+        int currentState = stateBuffer[index];
+        int neighbors = CountNeighbors(int2(x, y));
+
+        // ライフゲームのルールを適用
+        if (currentState == 1 && (neighbors < 2 || neighbors > 3))
+        {
+            nextStateBuffer[index] = 0; // 過疎または過密で死滅
+        }
+        else if (currentState == 0 && neighbors == 3)
+        {
+            nextStateBuffer[index] = 1; // 誕生
+        }
+        else
+        {
+            nextStateBuffer[index] = currentState; // 現状維持
+        }
+    }
+}

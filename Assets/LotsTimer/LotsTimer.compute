@@ -1,0 +1,16 @@
+#pragma kernel LotsTimerCS
+
+RWStructuredBuffer<float> timeBuffer;
+int timeBufferLength;
+float deltaTime;
+
+[numthreads(16, 16, 1)]
+void LotsTimerCS(uint3 id : SV_DispatchThreadID)
+{
+    uint index = id.x;
+    
+    if (index < timeBufferLength)
+    {
+        timeBuffer[index] += deltaTime;
+    }
+}
